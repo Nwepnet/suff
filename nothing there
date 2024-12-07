@@ -1,0 +1,199 @@
+-- Local stuff
+local skillOne = game.Players.LocalPlayer.PlayerGui.Main.Moveset['Lapse Blue'].ItemName
+local skillTwo = game.Players.LocalPlayer.PlayerGui.Main.Moveset['Reversal Red'].ItemName
+local skillThree = game.Players.LocalPlayer.PlayerGui.Main.Moveset['Rapid Punches'].ItemName
+local skillFour = game.Players.LocalPlayer.PlayerGui.Main.Moveset['Twofold Kick'].ItemName
+local ultTitle = game.Players.LocalPlayer.PlayerGui.Main.Ultimate.Title
+local UIGradientCustom = game.Players.LocalPlayer.PlayerGui.Main.Ultimate.Bar.Fill.UIGradient
+
+-- Gradient
+UIGradientCustom.Color = ColorSequence.new(Color3.fromRGB(3, 1, 201), Color3.fromRGB(41, 17, 69))
+
+-- Skill names
+skillOne.Text = "Lapse Pulse"
+skillTwo.Text = "Jujushiki Hanten: Aka"
+skillThree.Text = "120% Combo"
+skillFour.Text = "Kick"
+ultTitle.Text = "Throughout Heaven and Earth..."
+
+-- SKILL 1 --
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ChatService = game:GetService("Chat")
+
+local lapseBlueANIM = ReplicatedStorage.Animations.Gojo.LapseBlue
+local gojoTeleportANIM = ReplicatedStorage.Animations.Gojo.Teleport
+local hakariFeverBreakerANIM = ReplicatedStorage.Animations.Hakari.FeverBreaker
+
+local SWAP_DELAY = 0.01
+local PLAY_DURATION = 1.2
+local isAnimationSequenceActive = false
+
+local function sendChatMessage(message)
+    local args = { [1] = message, [2] = "All" }
+    pcall(function()
+        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(unpack(args))
+    end)
+    pcall(function()
+        ChatService:Chat(Players.LocalPlayer.Character, message, Enum.ChatColor.White)
+    end)
+end
+
+local function playAnimationSequence(player)
+    if isAnimationSequenceActive then return end
+    isAnimationSequenceActive = true
+
+    local character = player.Character
+    if not character then return end
+
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    if not humanoid then return end
+
+    local animations = {
+        gojoTeleport = Instance.new("Animation"),
+        hakariFeverBreaker = Instance.new("Animation")
+    }
+
+    animations.gojoTeleport.AnimationId = gojoTeleportANIM.AnimationId
+    animations.hakariFeverBreaker.AnimationId = hakariFeverBreakerANIM.AnimationId
+
+    local animTracks = {
+        gojoTeleport = humanoid:LoadAnimation(animations.gojoTeleport),
+        hakariFeverBreaker = humanoid:LoadAnimation(animations.hakariFeverBreaker)
+    }
+
+    -- Stop every existing animation
+    for _, track in pairs(humanoid:GetPlayingAnimationTracks()) do
+        track:Stop()
+    end
+
+    task.spawn(function()
+        animTracks.gojoTeleport:Play()
+        task.wait(1)
+        animTracks.gojoTeleport:Stop()
+
+        animTracks.hakariFeverBreaker:Play()
+        task.wait(1)
+        animTracks.hakariFeverBreaker:Stop()
+
+        task.wait(PLAY_DURATION)
+        isAnimationSequenceActive = false
+
+        for _, track in pairs(animTracks) do
+            track:Stop()
+        end
+    end)
+end
+
+local function onAnimationPlayed(animationTrack)
+    if animationTrack.Animation.AnimationId == lapseBlueANIM.AnimationId then
+        playAnimationSequence(Players.LocalPlayer)
+    end
+end
+
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+humanoid.AnimationPlayed:Connect(onAnimationPlayed)
+
+-- SKILL 2 --
+local reversalRedANIM = ReplicatedStorage.Animations.Gojo.ReversalRed
+local gojoUltANIM = ReplicatedStorage.Animations.Gojo.ReversalRedMaximum
+isAnimationSequenceActive = false
+
+local function playAnimationSequence(player)
+    if isAnimationSequenceActive then return end
+    isAnimationSequenceActive = true
+
+    local character = player.Character
+    if not character then return end
+
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    if not humanoid then return end
+
+    local animations = { gojoUlt = Instance.new("Animation") }
+    animations.gojoUlt.AnimationId = gojoUltANIM.AnimationId
+
+    local animTracks = { gojoUlt = humanoid:LoadAnimation(animations.gojoUlt) }
+
+    -- Stop every existing animation
+    for _, track in pairs(humanoid:GetPlayingAnimationTracks()) do
+        track:Stop()
+    end
+
+    task.spawn(function()
+        animTracks.gojoUlt:Play()
+        task.wait(1)
+        animTracks.gojoUlt:Stop()
+
+        task.wait(PLAY_DURATION)
+        isAnimationSequenceActive = false
+
+        for _, track in pairs(animTracks) do
+            track:Stop()
+        end
+    end)
+end
+
+local function onAnimationPlayed(animationTrack)
+    if animationTrack.Animation.AnimationId == reversalRedANIM.AnimationId then
+        playAnimationSequence(Players.LocalPlayer)
+    end
+end
+
+humanoid.AnimationPlayed:Connect(onAnimationPlayed)
+
+-- SKILL 3 --
+local megumiAnimations = {
+    ReplicatedStorage.Animations.Megumi.Melee.Melee1,
+    ReplicatedStorage.Animations.Megumi.Melee.Melee2,
+    ReplicatedStorage.Animations.Megumi.Melee.Melee3,
+    ReplicatedStorage.Animations.Megumi.Melee.Melee4
+}
+local cycleRepeats = math.floor(3 * #megumiAnimations) -- Total animations in 3 cycles
+local isAnimationSequenceActive = false
+
+local function playAnimationSequence(player)
+    if isAnimationSequenceActive then return end
+    isAnimationSequenceActive = true
+
+    local character = player.Character
+    if not character then return end
+
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    if not humanoid then return end
+
+    task.spawn(function()
+        -- Stop every existing animation
+        for _, track in pairs(humanoid:GetPlayingAnimationTracks()) do
+            track:Stop()
+        end
+
+        -- Play Megumi Melee animations for 3 seconds
+        local startTime = tick()
+        while tick() - startTime < 3 do
+            for i = 1, #megumiAnimations do
+                local animation = megumiAnimations[i]
+                local animTrack = humanoid:LoadAnimation(animation)
+                animTrack:Play()
+                animTrack:AdjustSpeed(2.5)  -- Set speed to 2.5 for faster animation execution
+                task.wait(animTrack.Length)
+                animTrack:Stop()
+
+                if tick() - startTime >= 3 then
+                    break
+                end
+            end
+        end
+
+        isAnimationSequenceActive = false
+    end)
+end
+
+local function onAnimationPlayed(animationTrack)
+    if animationTrack.Animation.AnimationId == ReplicatedStorage.Animations.Gojo.RapidPunches.AnimationId then
+        playAnimationSequence(Players.LocalPlayer)
+    end
+end
+
+humanoid.AnimationPlayed:Connect(onAnimationPlayed)
