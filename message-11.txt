@@ -1,0 +1,137 @@
+local lp = game.Players.LocalPlayer
+local char = lp.Character
+local hrp = char.HumanoidRootPart
+local bp =lp.Backpack
+local IsUser = false
+getgenv().username = 'ins'
+--No need to place its full name
+if char:GetAttribute('Character') == 'Bald' then
+else
+local args = {
+["Goal"] = "Change Character",
+["Character"] = "KJ The Stickman"
+}
+game.Players.LocalPlayer.Character:WaitForChild("Communicate"):FireServer(args)
+end
+if IsUser == false then
+local aguy = nil
+local usn = string.lower(getgenv().username)
+    local parts = workspace.Live:GetChildren()
+for i, part in ipairs(parts) do
+local lwr = string.lower(part.Name)
+if lwr:match(usn) then 
+aguy = part end end
+--[[    pcall(function()
+ workspace.CloneL:Destroy() end)
+task.wait(.1)
+char.Archivable = true
+local te = char:Clone() te.Parent = workspace
+te.HumanoidRootPart.CFrame = CFrame.new(0,1,0) te.Name = 'CloneL'
+_G.FaClone = te]]
+local Anim = Instance.new("Animation")
+Anim.AnimationId = "rbxassetid://15436465829"
+local k = game.Players.LocalPlayer.Character.Humanoid:LoadAnimation(Anim)
+k:Play()
+k:AdjustSpeed(1)
+pcall(function() getgenv().Lethal2P:Disconnect() end)
+getgenv().Lethal2P = aguy.Humanoid.AnimationPlayed:Connect(function(v)
+if v.Animation.AnimationId == "rbxassetid://12296113986" then
+    char.HumanoidRootPart.CFrame = aguy.HumanoidRootPart.CFrame
+    task.wait(1.2)
+    local args = {
+[1] = {
+["Goal"] = "Console Move",
+["Tool"] = bp['Normal Punch']
+}
+}
+game:GetService("Players").LocalPlayer.Character.Communicate:FireServer(unpack(args))
+
+end end)
+pcall(function() getgenv().FlowingWater2P:Disconnect() end)
+getgenv().FlowingWater2P = aguy.Humanoid.AnimationPlayed:Connect(function(v)
+if v.Animation.AnimationId == "rbxassetid://12273188754" then
+local lol = false
+spawn(function()
+for i= 1,500 do 
+    char.HumanoidRootPart.CFrame = aguy.HumanoidRootPart.CFrame
+*CFrame.new(0,0,-45)
+*CFrame.Angles(0,math.rad(180),0)
+task.wait() 
+if lol == true then break
+ end end end)
+task.wait(1.5)
+lol = true
+local args = {
+[1] = {
+["Goal"] = "Console Move",
+["Tool"] = bp['Uppercut']
+}
+}
+game:GetService("Players").LocalPlayer.Character.Communicate:FireServer(unpack(args))
+
+end end)
+
+pcall(function() getgenv().upr:Disconnect() end)
+getgenv().upr = char.Humanoid.AnimationPlayed:Connect(function(v)
+if v.Animation.AnimationId == "rbxassetid://12510170988" then
+    v:Stop()
+    hrp.Anchored=true
+local Anim = Instance.new("Animation")
+Anim.AnimationId = "rbxassetid://14719290328"
+local k = game.Players.LocalPlayer.Character.Humanoid:LoadAnimation(Anim)
+k:Play()
+k:AdjustSpeed(1)
+task.wait(1.4)
+k:Stop(.2)
+    hrp.Anchored=false
+end end)
+end
+pcall(function() getgenv().FlowingWater:Disconnect() end)
+getgenv().FlowingWater = char.Humanoid.AnimationPlayed:Connect(function(v)
+if v.Animation.AnimationId == "rbxassetid://12273188754" then
+    hrp.Anchored=true
+local Anim = Instance.new("Animation")
+Anim.AnimationId = "rbxassetid://13560306510"
+local k = game.Players.LocalPlayer.Character.Humanoid:LoadAnimation(Anim)
+k:Play()
+k:AdjustSpeed(2.5)
+k.Priority = Enum.AnimationPriority.Action2
+for i = 1,4 do 
+    k.TimePosition = 2
+    task.wait(.3) end
+    k.TimePosition = 3.6
+    k:AdjustSpeed(1)
+        hrp.Anchored=false
+end end)
+pcall(function() getgenv().Lethal:Disconnect() end)
+getgenv().Lethal = char.Humanoid.AnimationPlayed:Connect(function(v)
+if v.Animation.AnimationId == "rbxassetid://12296113986" then
+    local Anim = Instance.new("Animation")
+Anim.AnimationId = "rbxassetid://16719183472"
+local k = char.Humanoid:LoadAnimation(Anim)
+k:Play()
+k:AdjustSpeed(.7)
+k.TimePosition = 2
+k.Priority = Enum.AnimationPriority.Action4
+spawn(function()
+local function QuadBez(t,p0,p1,p2)
+return (1-t)^2*p0+2*(1-t)*t*p1+t^2*p2;
+end
+local s = 0
+local rnd = math.random(1,4)
+local s=  0
+local mlt = 3
+local rnd2= math.random(-15,15)
+local pc = hrp.CFrame.p
+local cp = hrp.CFrame*CFrame.new(0,122+math.random(-4,4),0).p
+local ep = hrp.CFrame*CFrame.new(0,99,0).p
+for i = 1,122 do s=s+1.5
+task.spawn(function()
+hrp.CFrame = CFrame.new(QuadBez(i/80,pc,cp,ep))*
+CFrame.Angles(math.rad(-i),i/8,0)
+end)
+task.wait(.01) 
+end
+ye:Disconnect()
+end)
+end end)
