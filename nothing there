@@ -145,17 +145,14 @@ humanoid.AnimationPlayed:Connect(onAnimationPlayed)
 
 -- SKILL 3 --
 local megumiAnimations = {
-    ReplicatedStorage.Animations.Megumi.Melee.Melee1,
-    ReplicatedStorage.Animations.Megumi.Melee.Melee2,
-    ReplicatedStorage.Animations.Megumi.Melee.Melee3,
-    ReplicatedStorage.Animations.Megumi.Melee.Melee4
+    ReplicatedStorage.Animations.Megumi.ShadowSwarm1,
+    ReplicatedStorage.Animations.Megumi.ShadowSwarm2
 }
-local cycleRepeats = math.floor(3 * #megumiAnimations) -- Total animations in 3 cycles
-local isAnimationSequenceActive = false
+local isSkill3Active = false  -- Prevents multiple triggers for Skill 3
 
 local function playAnimationSequence(player)
-    if isAnimationSequenceActive then return end
-    isAnimationSequenceActive = true
+    if isSkill3Active then return end
+    isSkill3Active = true  -- Set active to block re-triggering
 
     local character = player.Character
     if not character then return end
@@ -169,24 +166,15 @@ local function playAnimationSequence(player)
             track:Stop()
         end
 
-        -- Play Megumi Melee animations for 3 seconds
-        local startTime = tick()
-        while tick() - startTime < 3 do
-            for i = 1, #megumiAnimations do
-                local animation = megumiAnimations[i]
-                local animTrack = humanoid:LoadAnimation(animation)
-                animTrack:Play()
-                animTrack:AdjustSpeed(2.5)  -- Set speed to 2.5 for faster animation execution
-                task.wait(animTrack.Length)
-                animTrack:Stop()
-
-                if tick() - startTime >= 3 then
-                    break
-                end
-            end
+        -- Play each ShadowSwarm animation once
+        for _, animation in ipairs(megumiAnimations) do
+            local animTrack = humanoid:LoadAnimation(animation)
+            animTrack:Play()
+            task.wait(animTrack.Length)
+            animTrack:Stop()
         end
 
-        isAnimationSequenceActive = false
+        isSkill3Active = false  -- Reset after sequence completes
     end)
 end
 
