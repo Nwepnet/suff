@@ -1,9 +1,9 @@
 -- Configuration for chat messages and boosts
 local CONFIG = {
     EnableChatMessages = false,  -- Set to false to disable chat messages
-    FrontDashBoostSpeed = 200,  -- Configurable front dash boost speed
-    SideDashBoostSpeed = 150,    -- Configurable side dash boost speed
-    BoostDuration = 0.2,        -- Duration of boost
+    FrontDashBoostSpeed = 90,  -- Configurable front dash boost speed
+    SideDashBoostSpeed = 80,    -- Configurable side dash boost speed
+    BoostDuration = 0.4,        -- Duration of boost
     Language = "EN"             -- Languages: JP (Japanese), EN (English)
 }
 
@@ -21,12 +21,12 @@ local UIGradientCustom = game.Players.LocalPlayer.PlayerGui.Main.Ultimate.Bar.Fi
 UIGradientCustom.Color = ColorSequence.new(Color3.fromRGB(0, 0, 0), Color3.fromRGB(0, 0, 0))
 
 --Skill names
-skillOne.Text = "Ravage"
-skillTwo.Text = "Sweeps"
-skillThree.Text = "20-20-20 Dropkick"
-skillThreeTip.Text = "Black Flashable"
+skillOne.Text = "Pummel"
+skillTwo.Text = "Downslaim"
+skillThree.Text = "Uppercut"
+skillThreeTip.Text = "Sigma"
 skillFour.Text = "Evade"
-ultTitle.Text = "20 SERIES"
+ultTitle.Text = "No Ult"
 -- SKILL 1 --
 
 local Players = game:GetService("Players")
@@ -36,11 +36,11 @@ local ChatService = game:GetService("Chat")
 -- Animation references
 local cursedStrikesANIM = ReplicatedStorage.Animations.Itadori.CursedStrike
 local wideStrikeANIM = ReplicatedStorage.Animations.Choso.WingKing
-local overLuckANIM = ReplicatedStorage.Animations.Hakari.FeverBreaker
+local overLuckANIM = ReplicatedStorage.Animations.Hakari.OverLuck
 
 -- Configurable parameters
 local SWAP_DELAY = 0.01 -- Delay before swapping animations (in seconds)
-local PLAY_DURATION = 1.2 -- Total duration of animation sequence
+local PLAY_DURATION = 1.4 -- Total duration of animation sequence
 
 -- Prevent multiple triggers
 local isAnimationSequenceActive = false
@@ -64,7 +64,7 @@ local function sendChatMessage(message)
         },
         Skill4 = {
             JP = "良かったね、チキチータ！ (Good one, Chiquitita!)",
-            EN = "Shinae"
+            EN = "Nice one, Chiquitita!"
         }
     }
     
@@ -135,7 +135,7 @@ local function playAnimationSequence(player)
         -- Send chat message when ultimate animation plays
         sendChatMessage({
             JP = "チチチチキチタチ！", 
-            EN = "Chi-Chi-Chiquitita-Chi!"
+            EN = "Die!"
         })
         
         task.wait(2.4)
@@ -320,7 +320,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 -- Animation references
 local divergentFistANIM = ReplicatedStorage.Animations.Itadori.Variants.DivergentFist1
-local mahitoUltANIM = ReplicatedStorage.Animations.Mahito.SpikeWrath
+local mahitoUltANIM = ReplicatedStorage.Animations.Mahito.Ultimate2
 local cleaveFrANIM = ReplicatedStorage.Animations.Todo.SwiftKick
 
 -- Configurable parameters
