@@ -25,7 +25,7 @@ skillOne.Text = "Ravage"
 skillTwo.Text = "Sweeps"
 skillThree.Text = "20-20-20 Dropkick"
 skillThreeTip.Text = "Black Flashable"
-skillFour:Destroy()
+skillFour.Text = "Evade"
 ultTitle.Text = "20 SERIES"
 -- SKILL 1 --
 
