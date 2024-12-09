@@ -1,0 +1,420 @@
+--Local stuff
+local skillOne = game.Players.LocalPlayer.PlayerGui.Main.Moveset['Lapse Blue'].ItemName
+local skillTwo = game.Players.LocalPlayer.PlayerGui.Main.Moveset['Reversal Red'].ItemName
+local skillThree = game.Players.LocalPlayer.PlayerGui.Main.Moveset['Rapid Punches'].ItemName
+local skillFour = game.Players.LocalPlayer.PlayerGui.Main.Moveset['Twofold Kick'].ItemName
+local ultTitle = game.Players.LocalPlayer.PlayerGui.Main.Ultimate.Title
+local UIGradientCustom = game.Players.LocalPlayer.PlayerGui.Main.Ultimate.Bar.Fill.UIGradient
+
+--Gradient
+UIGradientCustom.Color = ColorSequence.new(Color3.fromRGB(3,1, 201), Color3.fromRGB(41,17,69))
+
+--Skill names
+skillOne.Text = "Jujushiki Hanten: Ao."
+skillTwo.Text = "Jujushiki Hanten: Aka."
+skillThree.Text = "Combo"
+skillFour.Text = "Sweep."
+ultTitle.Text = "No ultimate."
+
+-- SKILL 1 --
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ChatService = game:GetService("Chat")
+
+-- Animation references
+local lapseBlueANIM = ReplicatedStorage.Animations.Gojo.LapseBlue
+local hakariRoughEnergyANIM = ReplicatedStorage.Animations.Choso.QuickDraw
+local gojoUltANIM = ReplicatedStorage.Animations.Hakari.EnergySurge
+
+-- Configurable parameters
+local SWAP_DELAY = 0.01 -- Delay before swapping animations (in seconds)
+local PLAY_DURATION = 1.2 -- Total duration of animation sequence
+
+-- Prevent multiple triggers
+local isAnimationSequenceActive = false
+
+local function sendChatMessage(message)
+    -- FE-compatible chat method
+    local args = {
+        [1] = message,
+        [2] = "All"
+    }
+    
+    -- Try different chat methods to ensure compatibility
+    pcall(function()
+        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(unpack(args))
+    end)
+    
+    pcall(function()
+        ChatService:Chat(Players.LocalPlayer.Character, message, Enum.ChatColor.White)
+    end)
+end
+
+local function playAnimationSequence(player)
+    -- Ensure we don't trigger multiple times
+    if isAnimationSequenceActive then return end
+    isAnimationSequenceActive = true
+    
+    local character = player.Character
+    if not character then return end
+    
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    if not humanoid then return end
+    
+    -- Create animation instances
+    local animations = {
+        lapseBlue = Instance.new("Animation"),
+        hakariRoughEnergy = Instance.new("Animation") -- Added animation instance
+    }
+    
+    -- Set animation IDs
+    animations.lapseBlue.AnimationId = lapseBlueANIM.AnimationId
+    animations.hakariRoughEnergy.AnimationId = hakariRoughEnergyANIM.AnimationId -- Set animation ID
+    
+    -- Load animations
+    local animTracks = {
+        lapseBlue = humanoid:LoadAnimation(animations.lapseBlue),
+        hakariRoughEnergy = humanoid:LoadAnimation(animations.hakariRoughEnergy) -- Load animation
+    }
+    
+    -- Stop any existing animations
+    for _, track in pairs(humanoid:GetPlayingAnimationTracks()) do
+        track:Stop()
+    end
+    
+    -- Play animation sequence
+    task.spawn(function()
+        animTracks.lapseBlue:Play()
+        animTracks.hakariRoughEnergy:Play() -- Play additional animation
+        animTracks.lapseBlue.TimePosition = "0.02"
+        
+        -- Send chat message when ultimate animation plays
+        sendChatMessage("")
+        
+        task.wait(1.2)
+        animTracks.lapseBlue:Stop()
+        animTracks.hakariRoughEnergy:Stop() -- Stop additional animation
+        
+        -- Reset flag after sequence
+        task.wait(PLAY_DURATION)
+        isAnimationSequenceActive = false
+        
+        -- Stop all animations
+        for _, track in pairs(animTracks) do
+            track:Stop()
+        end
+    end)
+end
+
+-- Event handler for animation played
+local function onAnimationPlayed(animationTrack)
+    -- Check if the animation matches Lapse Blue
+    if animationTrack.Animation.AnimationId == lapseBlueANIM.AnimationId then
+        playAnimationSequence(Players.LocalPlayer)
+    end
+end
+
+-- Connect to local player's character
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+
+-- Connect animation played event
+humanoid.AnimationPlayed:Connect(onAnimationPlayed)
+
+-- SKILL 2 --
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+-- Animation references
+local reversalRedANIM = ReplicatedStorage.Animations.Gojo.ReversalRed
+local gojoUltANIM = ReplicatedStorage.Animations.Gojo.ReversalRedMaximum
+-- Configurable parameters
+local SWAP_DELAY = 0.01 -- Delay before swapping animations (in seconds)
+local PLAY_DURATION = 1.4 -- Total duration of animation sequence
+
+-- Prevent multiple triggers
+local isAnimationSequenceActive = false
+
+local function playAnimationSequence(player)
+    -- Ensure we don't trigger multiple times
+    if isAnimationSequenceActive then return end
+    isAnimationSequenceActive = true
+    
+    local character = player.Character
+    if not character then return end
+    
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    if not humanoid then return end
+    
+    -- Create animation instances
+    local animations = {
+        gojoUlt = Instance.new("Animation")
+    }
+    
+    -- Set animation IDs
+    animations.gojoUlt.AnimationId = gojoUltANIM.AnimationId
+    
+    -- Load animations
+    local animTracks = {
+        gojoUlt = humanoid:LoadAnimation(animations.gojoUlt)
+    }
+    
+    -- Stop any existing animations
+    for _, track in pairs(humanoid:GetPlayingAnimationTracks()) do
+        track:Stop()
+    end
+    
+    -- Play animation sequence
+    task.spawn(function()
+        animTracks.gojoUlt:Play()
+        animTracks.gojoUlt.TimePosition = "0.02"
+
+        sendChatMessage("")
+        task.wait(1)
+        animTracks.gojoUlt:Stop()
+        
+        -- Reset flag after sequence
+        task.wait(PLAY_DURATION)
+        isAnimationSequenceActive = false
+        
+        -- Stop all animations
+        for _, track in pairs(animTracks) do
+            track:Stop()
+        end
+    end)
+end
+
+-- Event handler for animation played
+local function onAnimationPlayed(animationTrack)
+    -- Check if the animation matches Cursed Strike
+    if animationTrack.Animation.AnimationId == reversalRedANIM.AnimationId then
+        playAnimationSequence(Players.LocalPlayer)
+    end
+end
+
+-- Connect to local player's character
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+
+-- Connect animation played event
+humanoid.AnimationPlayed:Connect(onAnimationPlayed)
+
+-- SKILL 3 --
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+-- Animation references
+local rapidPunchesANIM = ReplicatedStorage.Animations.Gojo.RapidPunches
+local shadowSwarmRunANIM = ReplicatedStorage.Animations.Choso.WingKing
+
+-- Configurable parameters
+local SWAP_DELAY = 0.01 -- Delay before swapping animations (in seconds)
+local PLAY_DURATION = 10 -- Total duration of animation sequence
+
+-- Prevent multiple triggers
+local isAnimationSequenceActive = false
+
+local function playAnimationSequence(player)
+    -- Ensure we don't trigger multiple times
+    if isAnimationSequenceActive then return end
+    isAnimationSequenceActive = true
+    
+    local character = player.Character
+    if not character then return end
+    
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    if not humanoid then return end
+    
+    -- Create animation instances
+    local animations = {
+        shadowSwarmRun = Instance.new("Animation") -- Updated animation instance
+    }
+    
+    -- Set animation IDs
+    animations.shadowSwarmRun.AnimationId = shadowSwarmRunANIM.AnimationId -- Set updated animation ID
+    
+    -- Load animations
+    local animTracks = {
+        shadowSwarmRun = humanoid:LoadAnimation(animations.shadowSwarmRun) -- Load updated animation
+    }
+    
+    -- Stop any existing animations
+    for _, track in pairs(humanoid:GetPlayingAnimationTracks()) do
+        track:Stop()
+    end
+    
+    -- Play animation sequence
+    task.spawn(function()
+        animTracks.shadowSwarmRun:Play()
+        animTracks.shadowSwarmRun.TimePosition = "0.02"
+
+        sendChatMessage("")
+        task.wait(3.2)
+        animTracks.shadowSwarmRun:Stop()
+        
+        -- Reset flag after sequence
+        task.wait(PLAY_DURATION)
+        isAnimationSequenceActive = false
+        
+        -- Stop all animations
+        for _, track in pairs(animTracks) do
+            track:Stop()
+        end
+    end)
+end
+
+-- Event handler for animation played
+local function onAnimationPlayed(animationTrack)
+    -- Check if the animation matches Cursed Strike
+    if animationTrack.Animation.AnimationId == rapidPunchesANIM.AnimationId then
+        playAnimationSequence(Players.LocalPlayer)
+    end
+end
+
+-- Connect to local player's character
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+
+-- Connect animation played event
+humanoid.AnimationPlayed:Connect(onAnimationPlayed)
+
+-- SKILL 4 --
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+-- Animation references
+local twofoldKickANIM = ReplicatedStorage.Animations.Gojo.TwofoldKick
+local gojoUltANIM = ReplicatedStorage.Animations.Todo.SwiftKick
+
+-- Configurable parameters
+local SWAP_DELAY = 0.01 -- Delay before swapping animations (in seconds)
+local PLAY_DURATION = 1.2 -- Total duration of animation sequence
+
+-- Prevent multiple triggers
+local isAnimationSequenceActive = false
+
+local function playAnimationSequence(player)
+    -- Ensure we don't trigger multiple times
+    if isAnimationSequenceActive then return end
+    isAnimationSequenceActive = true
+    
+    local character = player.Character
+    if not character then return end
+    
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    if not humanoid then return end
+    
+    -- Create animation instances
+    local animations = {
+        gojoUlt = Instance.new("Animation")
+    }
+    
+    -- Set animation IDs
+    animations.gojoUlt.AnimationId = gojoUltANIM.AnimationId
+    
+    -- Load animations
+    local animTracks = {
+        gojoUlt = humanoid:LoadAnimation(animations.gojoUlt)
+    }
+    
+    -- Stop any existing animations
+    for _, track in pairs(humanoid:GetPlayingAnimationTracks()) do
+        track:Stop()
+    end
+    
+    -- Play animation sequence
+    task.spawn(function()
+        animTracks.gojoUlt:Play()
+        animTracks.gojoUlt.TimePosition = "0.03"
+        sendChatMessage("")
+        task.wait(1)
+        animTracks.gojoUlt:Stop()
+        
+        -- Reset flag after sequence
+        task.wait(PLAY_DURATION)
+        isAnimationSequenceActive = false
+        
+        -- Stop all animations
+        for _, track in pairs(animTracks) do
+            track:Stop()
+        end
+    end)
+end
+
+-- Event handler for animation played
+local function onAnimationPlayed(animationTrack)
+    -- Check if the animation matches Cursed Strike
+    if animationTrack.Animation.AnimationId == twofoldKickANIM.AnimationId then
+        playAnimationSequence(Players.LocalPlayer)
+    end
+end
+
+-- Connect to local player's character
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+
+-- Connect animation played event
+humanoid.AnimationPlayed:Connect(onAnimationPlayed)
+
+--[[AURA-1]]
+
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+local humanoid = character:WaitForChild("Humanoid")
+local movementSpeed = 90
+
+local animation = Instance.new("Animation")
+animation.AnimationId = "rbxassetid://"
+local animator = humanoid:FindFirstChildOfClass("Animator") or humanoid:WaitForChild("Animator")
+local animationTrack
+
+-- Function to create the aura effect
+local function activateAura()
+    for i, v in character:GetChildren() do
+        if v:IsA("Part") then
+            local Attachment = Instance.new("Attachment")
+            local ParticleEmitter = Instance.new("ParticleEmitter")
+
+            Attachment.Parent = v
+            Attachment.Name = "aura"
+
+            ParticleEmitter.Brightness = 5
+            -- Dark purple color
+            ParticleEmitter.Color = ColorSequence.new({
+                ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 8, 255)), -- DodgerBlue
+                ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 8, 255))  -- DodgerBlue
+            })
+            ParticleEmitter.Drag = 3
+            ParticleEmitter.FlipbookLayout = Enum.ParticleFlipbookLayout.Grid4x4
+            ParticleEmitter.FlipbookMode = Enum.ParticleFlipbookMode.OneShot
+            ParticleEmitter.Lifetime = NumberRange.new(0.5, 0.5)
+            ParticleEmitter.LightEmission = 2
+            ParticleEmitter.LockedToPart = true
+            ParticleEmitter.Rate = 30 -- Increased to 20 particles per second
+            ParticleEmitter.Size = NumberSequence.new({NumberSequenceKeypoint.new(0, 2, 0), NumberSequenceKeypoint.new(1, 2, 0)})
+            ParticleEmitter.Speed = NumberRange.new(0, 0)
+            ParticleEmitter.Texture = "rbxassetid://11844017484"
+            ParticleEmitter.Transparency = NumberSequence.new({
+                NumberSequenceKeypoint.new(0, 1, 0),
+                NumberSequenceKeypoint.new(0.198684, 0.491803, 0),
+                NumberSequenceKeypoint.new(0.501316, 0.513661, 0),
+                NumberSequenceKeypoint.new(0.798684, 0.497268, 0),
+                NumberSequenceKeypoint.new(1, 1, 0)
+            })
+            ParticleEmitter.ZOffset = -1
+            ParticleEmitter.Parent = Attachment
+        end
+    end
+end
+
+-- Activate the aura effect when the script runs
+activateAura()
