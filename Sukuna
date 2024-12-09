@@ -96,9 +96,9 @@ local UIGradientCustom = game.Players.LocalPlayer.PlayerGui.Main.Ultimate.Bar.Fi
 UIGradientCustom.Color = ColorSequence.new(Color3.fromRGB(255, 255, 255), Color3.fromRGB(0, 0, 0))
 
 --Skill names
-skillOne.Text = "Pummel Of The Cursed Spirit"
-skillTwo.Text = "Soul Smash"
-skillThree.Text = "Truly a Curse"
+skillOne.Text = "Cleave"
+skillTwo.Text = "Dismantle"
+skillThree.Text = "True Jujutsu"
 skillThreeTip.Text = ""
 skillFour.Text = "Evade"
 ultTitle.Text = "No Ultimate"
@@ -255,7 +255,7 @@ local chosoMelee4ANIM = ReplicatedStorage.Animations.Itadori.Cleave
 
 -- Configurable parameters
 local SWAP_DELAY = 0.01 -- Delay before swapping animations (in seconds)
-local PLAY_DURATION = 1.2 -- Total duration of animation sequence
+local PLAY_DURATION = 1.6 -- Total duration of animation sequence
 
 -- Prevent multiple triggers
 local isAnimationSequenceActive = false
@@ -304,7 +304,7 @@ local function playAnimationSequence(player)
         animTracks.wideStrike:Stop()
         animTracks.chosoMelee4:Play()
         animTracks.chosoMelee4:AdjustSpeed(0.7)
-        task.wait(0.6)
+        task.wait(1.5)
         animTracks.chosoMelee4:Stop()
         
         -- Reset flag after sequence
