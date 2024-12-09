@@ -176,7 +176,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 -- Animation references
 local crushingBlowANIM = ReplicatedStorage.Animations.Itadori.CrushingBlow
 local wideStrikeANIM = ReplicatedStorage.Animations.Itadori.Dismantle
-local chosoMelee4ANIM = ReplicatedStorage.Animations.Mahito.ForceGrab
+local chosoMelee4ANIM = ReplicatedStorage.Animations.Itadori.Cleave
 
 -- Configurable parameters
 local SWAP_DELAY = 0.01 -- Delay before swapping animations (in seconds)
