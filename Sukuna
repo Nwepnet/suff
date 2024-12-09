@@ -1,78 +1,3 @@
--- Animation references for Itadori Ultimate
-local itadoriUltimateANIM = ReplicatedStorage.Animations.Itadori.Ultimate
-
--- Configurable parameters
-local SWAP_DELAY = 0.01 -- Delay before swapping animations (in seconds)
-local PLAY_DURATION = 1.5 -- Total duration of animation sequence
-
--- Prevent multiple triggers
-local isAnimationSequenceActive = false
-
-local function playUltimateAnimationSequence(player)
-    -- Ensure we don't trigger multiple times
-    if isAnimationSequenceActive then return end
-    isAnimationSequenceActive = true
-    
-    local character = player.Character
-    if not character then return end
-    
-    local humanoid = character:FindFirstChildOfClass("Humanoid")
-    if not humanoid then return end
-    
-    -- Create animation instances
-    local ultimateAnim = Instance.new("Animation")
-    
-    -- Set animation ID
-    ultimateAnim.AnimationId = itadoriUltimateANIM.AnimationId
-    
-    -- Load animation
-    local animTrack = humanoid:LoadAnimation(ultimateAnim)
-    
-    -- Stop any existing animations
-    for _, track in pairs(humanoid:GetPlayingAnimationTracks()) do
-        track:Stop()
-    end
-    
-    -- Play animation sequence
-    task.spawn(function()
-        animTrack:Play()
-        animTrack:AdjustSpeed(1.5)
-        
-        -- Apply particle effect during ultimate animation
-        triggerParticleEffect()
-        
-        -- Send chat message when ultimate animation plays
-        sendChatMessage({
-            JP = "これが私の真の力だ！", 
-            EN = "This is my true power!"
-        })
-        
-        -- Wait for the animation to complete
-        task.wait(PLAY_DURATION)
-        
-        -- Reset flag after sequence
-        isAnimationSequenceActive = false
-        
-        -- Stop animation
-        animTrack:Stop()
-    end)
-end
-
--- Event handler for animation played (Itadori Ultimate)
-local function onAnimationPlayed(animationTrack)
-    -- Check if the animation matches Itadori Ultimate
-    if animationTrack.Animation.AnimationId == itadoriUltimateANIM.AnimationId then
-        playUltimateAnimationSequence(Players.LocalPlayer)
-    end
-end
-
--- Connect to local player's character
-local player = Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local humanoid = character:WaitForChild("Humanoid")
-
--- Connect animation played event
-humanoid.AnimationPlayed:Connect(onAnimationPlayed)
 -- Configuration for chat messages and boosts
 local CONFIG = {
     EnableChatMessages = true,  -- Set to false to disable chat messages
@@ -98,7 +23,7 @@ UIGradientCustom.Color = ColorSequence.new(Color3.fromRGB(255, 255, 255), Color3
 --Skill names
 skillOne.Text = "Cleave"
 skillTwo.Text = "Dismantle"
-skillThree.Text = "True Jujutsu"
+skillThree.Text = "Real Jujutsu"
 skillThreeTip.Text = ""
 skillFour.Text = "Evade"
 ultTitle.Text = "No Ultimate"
@@ -250,12 +175,12 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 -- Animation references
 local crushingBlowANIM = ReplicatedStorage.Animations.Itadori.CrushingBlow
-local wideStrikeANIM = ReplicatedStorage.Animations.Itadori.Dismantle
-local chosoMelee4ANIM = ReplicatedStorage.Animations.Itadori.Cleave
+local wideStrikeANIM = ReplicatedStorage.Animations.Itadori.Cleave
+local chosoMelee4ANIM = ReplicatedStorage.Animations.Itadori.Dismantle
 
 -- Configurable parameters
 local SWAP_DELAY = 0.01 -- Delay before swapping animations (in seconds)
-local PLAY_DURATION = 1.6 -- Total duration of animation sequence
+local PLAY_DURATION = 1.5 -- Total duration of animation sequence
 
 -- Prevent multiple triggers
 local isAnimationSequenceActive = false
@@ -298,13 +223,13 @@ local function playAnimationSequence(player)
         animTracks.wideStrike.TimePosition = 0.02
         sendChatMessage({
             JP = "公平にプレイする必要はありません。", 
-            EN = "Dismantle."
+            EN = "Dismantle!"
         })
-        task.wait(1)
+        task.wait(2)
         animTracks.wideStrike:Stop()
         animTracks.chosoMelee4:Play()
-        animTracks.chosoMelee4:AdjustSpeed(0.7)
-        task.wait(1.5)
+        animTracks.chosoMelee4:AdjustSpeed(0.9)
+        task.wait(1)
         animTracks.chosoMelee4:Stop()
         
         -- Reset flag after sequence
@@ -450,7 +375,7 @@ local function playAnimationSequence(player)
         ApplyBoost(character, boostDirection, CONFIG.FrontDashBoostSpeed)
         sendChatMessage({
             JP = "チキチータ..夢はありますか？", 
-            EN = "This is True Jujutsu!"
+            EN = "Fool. This is real jujutsu!"
         })
         task.wait(0.32)
         animTracks.mahitoUlt:Stop()
@@ -495,11 +420,11 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 -- Animation references
 local manjiKickANIM = ReplicatedStorage.Animations.Itadori.ManjiKick
-local hakariCounterANIM = ReplicatedStorage.Animations.Mahito.SpikeWrath
+local hakariCounterANIM = ReplicatedStorage.Animations.Hakari.Counter
 
 -- Configurable parameters
 local SWAP_DELAY = 0.01 -- Delay before swapping animations (in seconds)
-local PLAY_DURATION = 1 -- Total duration of animation sequence
+local PLAY_DURATION = 1.4 -- Total duration of animation sequence
 
 -- Prevent multiple triggers
 local isAnimationSequenceActive = false
