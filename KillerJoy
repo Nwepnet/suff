@@ -1,0 +1,295 @@
+--Local stuff
+local skillOne = game.Players.LocalPlayer.PlayerGui.Main.Moveset['Cursed Strikes'].ItemName
+local skillTwo = game.Players.LocalPlayer.PlayerGui.Main.Moveset['Crushing Blow'].ItemName
+local skillThree = game.Players.LocalPlayer.PlayerGui.Main.Moveset['Divergent Fist'].ItemName
+local skillFour = game.Players.LocalPlayer.PlayerGui.Main.Moveset['Manji Kick'] 
+local skillThreeToolTip = game.Players.LocalPlayer.PlayerGui.Main.Moveset['Divergent Fist'].Tip
+local ultTitle = game.Players.LocalPlayer.PlayerGui.Main.Ultimate.Title
+
+--Skill names
+skillOne.Text = "Ravage"
+skillTwo.Text = "Swift Sweep"
+skillThree.Text = "Collateral Ruin"
+skillThreeToolTip.Text = "Black Flash-able"
+skillFour:Destroy()
+ultTitle.Text = "20 SERIES"
+
+-- SKILL 1 --
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+-- Animation references
+local cursedStrikeANIM = ReplicatedStorage.Animations.Itadori.CursedStrike
+local roughEnergyANIM = ReplicatedStorage.Animations.Hakari.RoughEnergy
+local vesselMelee1 = ReplicatedStorage.Animations.Itadori.Melee.Melee1
+local vesselMelee2 = ReplicatedStorage.Animations.Itadori.Melee.Melee2
+local luckyVolleyANIM = ReplicatedStorage.Animations.Choso.WingKing
+local hakariMelee4 = ReplicatedStorage.Animations.Hakari.Melee.Melee4
+
+-- Configurable parameters
+local SWAP_DELAY = 0.01 -- Delay before swapping animations (in seconds)
+local PLAY_DURATION = 10 -- Total duration of animation sequence
+
+-- Prevent multiple triggers
+local isAnimationSequenceActive = false
+
+local function playAnimationSequence(player)
+    -- Ensure we don't trigger multiple times
+    if isAnimationSequenceActive then return end
+    isAnimationSequenceActive = true
+    
+    local character = player.Character
+    if not character then return end
+    
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    if not humanoid then return end
+    
+    -- Create animation instances
+    local animations = {
+        roughEnergy = Instance.new("Animation"),
+        melee1 = Instance.new("Animation"),
+        melee2 = Instance.new("Animation"),
+        luckyVolley = Instance.new("Animation"),
+        hMelee4 = Instance.new("Animation")
+    }
+    
+    -- Set animation IDs
+    animations.roughEnergy.AnimationId = roughEnergyANIM.AnimationId
+    animations.melee1.AnimationId = vesselMelee1.AnimationId
+    animations.melee2.AnimationId = vesselMelee2.AnimationId
+    animations.luckyVolley.AnimationId = luckyVolleyANIM.AnimationId
+    animations.hMelee4.AnimationId = hakariMelee4.AnimationId
+    
+    -- Load animations
+    local animTracks = {
+        roughEnergy = humanoid:LoadAnimation(animations.roughEnergy),
+        melee1 = humanoid:LoadAnimation(animations.melee1),
+        melee2 = humanoid:LoadAnimation(animations.melee2),
+        luckyVolley = humanoid:LoadAnimation(animations.luckyVolley),
+        hMelee4 = humanoid:LoadAnimation(animations.hMelee4)
+    }
+    
+    -- Stop any existing animations
+    for _, track in pairs(humanoid:GetPlayingAnimationTracks()) do
+        track:Stop()
+    end
+    
+    -- Play animation sequence
+    task.spawn(function()
+        animTracks.roughEnergy:Play()
+        task.wait(0.5)
+        animTracks.roughEnergy:Stop()
+        
+        -- Melee Sequence
+        animTracks.melee1:Play()
+        task.wait(0.3)
+        animTracks.melee1:Stop()
+        animTracks.melee2:Play()
+        task.wait(0.6)
+        animTracks.melee2:Stop()
+        animTracks.luckyVolley:Play()
+        task.wait(1.2)
+        animTracks.luckyVolley:Stop()
+        animTracks.hMelee4:Play()
+        
+        -- Reset flag after sequence
+        task.wait(PLAY_DURATION)
+        isAnimationSequenceActive = false
+        
+        -- Stop all animations
+        for _, track in pairs(animTracks) do
+            track:Stop()
+        end
+    end)
+end
+
+-- Event handler for animation played
+local function onAnimationPlayed(animationTrack)
+    -- Check if the animation matches Cursed Strike
+    if animationTrack.Animation.AnimationId == cursedStrikeANIM.AnimationId then
+        playAnimationSequence(Players.LocalPlayer)
+    end
+end
+
+-- Connect to local player's character
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+
+-- Connect animation played event
+humanoid.AnimationPlayed:Connect(onAnimationPlayed)
+
+-- SKILL 2 --
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+-- Animation references
+local crushingBlowANIM = ReplicatedStorage.Animations.Itadori.CrushingBlow
+local hakariMelee2 = ReplicatedStorage.Animations.Gojo.TwofoldKick
+local hakariMelee4 = ReplicatedStorage.Animations.Hakari.Melee.Melee4
+
+-- Configurable parameters
+local SWAP_DELAY = 0.01 -- Delay before swapping animations (in seconds)
+local PLAY_DURATION = 8 -- Total duration of animation sequence
+
+-- Prevent multiple triggers
+local isAnimationSequenceActive = false
+
+local function playAnimationSequence(player)
+    -- Ensure we don't trigger multiple times
+    if isAnimationSequenceActive then return end
+    isAnimationSequenceActive = true
+    
+    local character = player.Character
+    if not character then return end
+    
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    if not humanoid then return end
+    
+    -- Create animation instances
+    local animations = {
+        melee2 = Instance.new("Animation"),
+        melee4 = Instance.new("Animation")
+    }
+    
+    -- Set animation IDs
+    animations.melee2.AnimationId = hakariMelee2.AnimationId
+    animations.melee4.AnimationId = hakariMelee4.AnimationId
+    
+    -- Load animations
+    local animTracks = {
+        melee2 = humanoid:LoadAnimation(animations.melee2),
+        melee4 = humanoid:LoadAnimation(animations.melee4)
+    }
+    
+    -- Stop any existing animations
+    for _, track in pairs(humanoid:GetPlayingAnimationTracks()) do
+        track:Stop()
+    end
+    
+    -- Play animation sequence
+    task.spawn(function()
+        animTracks.melee2:Play()
+        task.wait(0.6)
+        animTracks.melee2:Stop()
+        animTracks.melee4:Play()
+        
+        -- Reset flag after sequence
+        task.wait(PLAY_DURATION)
+        isAnimationSequenceActive = false
+        
+        -- Stop all animations
+        for _, track in pairs(animTracks) do
+            track:Stop()
+        end
+    end)
+end
+
+-- Event handler for animation played
+local function onAnimationPlayed(animationTrack)
+    -- Check if the animation matches Cursed Strike
+    if animationTrack.Animation.AnimationId == crushingBlowANIM.AnimationId then
+        playAnimationSequence(Players.LocalPlayer)
+    end
+end
+
+-- Connect to local player's character
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+
+-- Connect animation played event
+humanoid.AnimationPlayed:Connect(onAnimationPlayed)
+
+-- SKILL 3 --
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+-- Animation references
+local divergentFist = ReplicatedStorage.Animations.Itadori.Variants.DivergentFist1
+local greatSerpent = ReplicatedStorage.Animations.Megumi.GreatSerpent
+local headSplitter = ReplicatedStorage.Animations.Choso.SlicingExorcism
+
+-- Configurable parameters
+local SWAP_DELAY = 0.01 -- Delay before swapping animations (in seconds)
+local PLAY_DURATION = 1 -- Total duration of animation sequence
+local FRAME_TO_START = 57 -- The frame we want to start at
+local FPS = 120 -- Standard frame rate for Roblox animations
+
+-- Calculate time position based on frame
+local TIME_POSITION = FRAME_TO_START / FPS
+
+-- Prevent multiple triggers
+local isAnimationSequenceActive = false
+
+local function playAnimationSequence(player)
+    -- Ensure we don't trigger multiple times
+    if isAnimationSequenceActive then return end
+    isAnimationSequenceActive = true
+
+    local character = player.Character
+    if not character then return end
+
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    if not humanoid then return end
+
+    -- Create animation instances
+    local animations = {
+        serpent = Instance.new("Animation"),
+        hSplitter = Instance.new("Animation")
+    }
+
+    -- Set animation IDs
+    animations.serpent.AnimationId = greatSerpent.AnimationId
+    animations.hSplitter.AnimationId = headSplitter.AnimationId
+
+    -- Load animations
+    local animTracks = {
+        serpent = humanoid:LoadAnimation(animations.serpent),
+        hSplitter = humanoid:LoadAnimation(animations.hSplitter)
+    }
+
+    -- Stop any existing animations
+    for _, track in pairs(humanoid:GetPlayingAnimationTracks()) do
+        track:Stop()
+    end
+
+    -- Play animation sequence
+    task.spawn(function()
+        animTracks.serpent:Play()
+        task.wait(0.2)
+        animTracks.serpent:Stop()
+        animTracks.hSplitter:Play()
+        animTracks.hSplitter.TimePosition = TIME_POSITION
+        
+        task.wait(1.2)
+        animTracks.hSplitter:Stop()
+
+        -- Reset flag after sequence
+        task.wait(PLAY_DURATION)
+        isAnimationSequenceActive = false
+
+        -- Stop all animations
+        for _, track in pairs(animTracks) do
+            track:Stop()
+        end
+    end)
+end
+
+-- Event handler for animation played
+local function onAnimationPlayed(animationTrack)
+    -- Check if the animation matches Cursed Strike
+    if animationTrack.Animation.AnimationId == divergentFist.AnimationId then
+        playAnimationSequence(Players.LocalPlayer)
+    end
+end
+
+-- Connect to local player's character
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+
+-- Connect animation played event
+humanoid.AnimationPlayed:Connect(onAnimationPlayed)
