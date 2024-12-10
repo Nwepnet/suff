@@ -28,7 +28,7 @@ local gojoUltANIM = ReplicatedStorage.Animations.Hakari.FeverBreaker
 
 -- Configurable parameters
 local SWAP_DELAY = 0.01 -- Delay before swapping animations (in seconds)
-local PLAY_DURATION = 10 -- Total duration of animation sequence
+local PLAY_DURATION = 1.5 -- Total duration of animation sequence
 
 -- Prevent multiple triggers
 local isAnimationSequenceActive = false
@@ -209,7 +209,7 @@ local gojoUltANIM = ReplicatedStorage.Animations.Choso.WingKing
 
 -- Configurable parameters
 local SWAP_DELAY = 0.01 -- Delay before swapping animations (in seconds)
-local PLAY_DURATION = 0.01 -- Total duration of animation sequence
+local PLAY_DURATION = 1.5 -- Total duration of animation sequence
 
 -- Prevent multiple triggers
 local isAnimationSequenceActive = false
@@ -249,7 +249,7 @@ local function playAnimationSequence(player)
         animTracks.gojoUlt.TimePosition = "0"
 
         sendChatMessage("Hamamada!")
-        task.wait(3.1)
+        task.wait(3.5)
         animTracks.gojoUlt:Stop()
         
         -- Reset flag after sequence
