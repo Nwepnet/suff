@@ -1,13 +1,13 @@
 -- Configuration for chat messages and boosts
 local CONFIG = {
-    EnableChatMessages = false,  -- Set to false to disable chat messages
-    FrontDashBoostSpeed = 90,  -- Configurable front dash boost speed
-    SideDashBoostSpeed = 80,    -- Configurable side dash boost speed
+    EnableChatMessages = true,  -- Set to false to disable chat messages
+    FrontDashBoostSpeed = 190,  -- Configurable front dash boost speed
+    SideDashBoostSpeed = 550,    -- Configurable side dash boost speed
     BoostDuration = 0.4,        -- Duration of boost
     Language = "EN"             -- Languages: JP (Japanese), EN (English)
 }
 
---Local Stuff
+-- Local Stuff
 local skillOne = game.Players.LocalPlayer.PlayerGui.Main.Moveset['Cursed Strikes'].ItemName
 local skillTwo = game.Players.LocalPlayer.PlayerGui.Main.Moveset['Crushing Blow'].ItemName
 local skillThree = game.Players.LocalPlayer.PlayerGui.Main.Moveset['Divergent Fist'].ItemName
@@ -17,17 +17,70 @@ local skillFour = game.Players.LocalPlayer.PlayerGui.Main.Moveset['Manji Kick'].
 local ultTitle = game.Players.LocalPlayer.PlayerGui.Main.Ultimate.Title
 local UIGradientCustom = game.Players.LocalPlayer.PlayerGui.Main.Ultimate.Bar.Fill.UIGradient
 
---Gradient
+-- Gradient
 UIGradientCustom.Color = ColorSequence.new(Color3.fromRGB(0, 0, 0), Color3.fromRGB(0, 0, 0))
 
---Skill names
-skillOne.Text = "Sonido Rampage"
+-- Skill names
+skillOne.Text = "Sonido Pummel"
 skillTwo.Text = "Bala Grab"
-skillThree.Text = "Fast Attack"
+skillThree.Text = "Sonido Rush"
 skillThreeTip.Text = ""
-skillFour.Text = "Sonido Evade"
-ultTitle.Text = "Pantera!"
+skillFour.Text = "Evasive"
+ultTitle.Text = "PANTERA!"
+
 -- SKILL 1 --
+
+-- Function to add dash
+local function EasingFunction(t, style, direction)
+    local styles = {
+        Linear = function(p) return p end,
+        Cubic = function(p)
+            if direction == "Out" then
+                return 1 - math.pow(1 - p, 3)
+            end
+            return p * p * p
+        end
+    }
+    
+    local easingFunc = styles[style] or styles["Linear"]
+    return easingFunc(t)
+end
+
+-- Function to apply boost when the move is triggered
+local function ApplyBoost(character, boostSpeed)
+    local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+    local humanoid = character:FindFirstChild("Humanoid")
+    
+    if humanoidRootPart and humanoid then
+        local isCurrentlyBoosting = true
+        local startTime = tick()
+        
+        local boostConnection
+        boostConnection = game:GetService("RunService").Heartbeat:Connect(function()
+            if not isCurrentlyBoosting then
+                boostConnection:Disconnect()
+                return
+            end
+            
+            local elapsed = tick() - startTime
+            local progress = math.min(elapsed / CONFIG.BoostDuration, 1)
+            
+            local easedProgress = EasingFunction(progress, "Cubic", "Out")
+            
+            -- Get the character's forward direction and apply boost
+            local forwardDirection = humanoidRootPart.CFrame.LookVector
+            local boostForce = forwardDirection * (boostSpeed * easedProgress)
+            
+            humanoidRootPart.Velocity = boostForce
+            
+            if progress >= 1 then
+                isCurrentlyBoosting = false
+                boostConnection:Disconnect()
+                humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+            end
+        end)
+    end
+end
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -35,12 +88,12 @@ local ChatService = game:GetService("Chat")
 
 -- Animation references
 local cursedStrikesANIM = ReplicatedStorage.Animations.Itadori.CursedStrike
-local wideStrikeANIM = ReplicatedStorage.Animations.Mahito.WideStrike
-local overLuckANIM = ReplicatedStorage.Animations.Choso.WingKing
+local wideStrikeANIM = ReplicatedStorage.Animations.Choso.WingKing
+local overLuckANIM = ReplicatedStorage.Animations.Itadori.Rush
 
 -- Configurable parameters
 local SWAP_DELAY = 0.01 -- Delay before swapping animations (in seconds)
-local PLAY_DURATION = 1.2 -- Total duration of animation sequence
+local PLAY_DURATION = 0.5 -- Total duration of animation sequence
 
 -- Prevent multiple triggers
 local isAnimationSequenceActive = false
@@ -51,20 +104,20 @@ local function sendChatMessage(message)
     -- Define messages for different languages
     local messages = {
         Skill1 = {
-            JP = "さあ、チキチータ！ (Come on, Chiquitita!)",
-            EN = "Let's go, Chiquitita!"
+            JP = "skill1",
+            EN = "a!"
         },
         Skill2 = {
-            JP = "これは本当に不公平ですよね？ (This isn't really fair, Is it?)",
-            EN = "This doesn't seem fair, right?"
+            JP = "Sigma",
+            EN = "Placeholder"
         },
         Skill3 = {
-            JP = "チキチータ、夢はある？ (Chiquitita, You have a dream?)",
-            EN = "Chiquitita, do you have a dream?"
+            JP = "PlaceHolder",
+            EN = "Placeholder"
         },
         Skill4 = {
-            JP = "良かったね、チキチータ！ (Good one, Chiquitita!)",
-            EN = "Nice one, Chiquitita!"
+            JP = "Placeholder",
+            EN = "Placeholder"
         }
     }
     
@@ -130,15 +183,15 @@ local function playAnimationSequence(player)
         task.wait(0.4)
         animTracks.overLuck:Stop()
         animTracks.wideStrike:Play()
-        animTracks.wideStrike.TimePosition = 4.5
+        animTracks.wideStrike.TimePosition = 0
         
         -- Send chat message when ultimate animation plays
         sendChatMessage({
             JP = "チチチチキチタチ！", 
-            EN = "Chi-Chi-Chiquitita-Chi!"
+            EN = "I'll Just have to kill you both."
         })
         
-        task.wait(2.4)
+        task.wait(3)
         animTracks.wideStrike:Stop()
         
         -- Reset flag after sequence
@@ -156,6 +209,8 @@ end
 local function onAnimationPlayed(animationTrack)
     -- Check if the animation matches Lapse Blue
     if animationTrack.Animation.AnimationId == cursedStrikesANIM.AnimationId then
+        -- Trigger the boost when skill is used
+        ApplyBoost(Players.LocalPlayer.Character, CONFIG.FrontDashBoostSpeed)
         playAnimationSequence(Players.LocalPlayer)
     end
 end
@@ -175,7 +230,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 -- Animation references
 local crushingBlowANIM = ReplicatedStorage.Animations.Itadori.CrushingBlow
-local wideStrikeANIM = ReplicatedStorage.Animations.Mahito.ForceGrab
+local wideStrikeANIM = ReplicatedStorage.Animations.Gojo.Teleport
 local chosoMelee4ANIM = ReplicatedStorage.Animations.Gojo.Teleport
 
 -- Configurable parameters
@@ -223,7 +278,7 @@ local function playAnimationSequence(player)
         animTracks.wideStrike.TimePosition = 0.5
         sendChatMessage({
             JP = "公平にプレイする必要はありません。", 
-            EN = "You don't have to play fair!"
+            EN = "Bala."
         })
         task.wait(0.6)
         animTracks.wideStrike:Stop()
@@ -320,12 +375,12 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 -- Animation references
 local divergentFistANIM = ReplicatedStorage.Animations.Itadori.Variants.DivergentFist1
-local mahitoUltANIM = ReplicatedStorage.Animations.Mahito.Ultimate2
-local cleaveFrANIM = ReplicatedStorage.Animations.Hakari.Melee.Melee4
+local mahitoUltANIM = ReplicatedStorage.Animations.Mahito.SpikeWrath
+local cleaveFrANIM = ReplicatedStorage.Animations.Mahito.FocusStrike
 
 -- Configurable parameters
 local SWAP_DELAY = 0.01 -- Delay before swapping animations (in seconds)
-local PLAY_DURATION = 0.5 -- Total duration of animation sequence
+local PLAY_DURATION = 0.7 -- Total duration of animation sequence
 
 -- Prevent multiple triggers
 local isAnimationSequenceActive = false
@@ -375,7 +430,7 @@ local function playAnimationSequence(player)
         ApplyBoost(character, boostDirection, CONFIG.FrontDashBoostSpeed)
         sendChatMessage({
             JP = "チキチータ..夢はありますか？", 
-            EN = "Chiquitita.. You have a dream?"
+            EN = "Idiot."
         })
         task.wait(0.32)
         animTracks.mahitoUlt:Stop()
@@ -469,7 +524,7 @@ local function playAnimationSequence(player)
         ApplyBoost(character, boostDirection, CONFIG.SideDashBoostSpeed)
         sendChatMessage({
             JP = "チキチータ..", 
-            EN = "Chiquitita.."
+            EN = "Sonido.."
         })
         task.wait(1)
         animTracks.hakariCounter:Stop()
