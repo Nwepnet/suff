@@ -89,7 +89,7 @@ local ChatService = game:GetService("Chat")
 -- Animation references
 local cursedStrikesANIM = ReplicatedStorage.Animations.Itadori.CursedStrike
 local wideStrikeANIM = ReplicatedStorage.Animations.Choso.WingKing
-local overLuckANIM = ReplicatedStorage.Animations.Itadori.Rush
+local overLuckANIM = ReplicatedStorage.Animations.Mahito.WideStrike
 
 -- Configurable parameters
 local SWAP_DELAY = 0.01 -- Delay before swapping animations (in seconds)
@@ -178,9 +178,9 @@ local function playAnimationSequence(player)
     -- Play animation sequence
     task.spawn(function()
         animTracks.overLuck:Play()
-        animTracks.overLuck.TimePosition = 1.5
-        animTracks.overLuck:AdjustSpeed(1.4)
-        task.wait(0.4)
+        animTracks.overLuck.TimePosition = 8.5
+        animTracks.overLuck:AdjustSpeed(1)
+        task.wait(1.2)
         animTracks.overLuck:Stop()
         animTracks.wideStrike:Play()
         animTracks.wideStrike.TimePosition = 0
