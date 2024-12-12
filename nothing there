@@ -249,31 +249,28 @@ local function playAnimationSequence(player)
         animTracks.gojoUlt.TimePosition = "-1"
 
         sendChatMessage("Hamamada!")
-        task.wait(1) -- Delay before CFrame flight starts
+        task.wait(1) -- Delay before flight starts
         
-        -- Start CFrame flight
+        -- Start BodyVelocity flight
         local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
-        local originalPosition = humanoidRootPart.Position
-        local targetPosition = originalPosition + Vector3.new(0, 50, 0)  -- Flight upwards for 2 seconds
-
-        -- Move the player upwards
+        local bodyVelocity = Instance.new("BodyVelocity")
+        bodyVelocity.MaxForce = Vector3.new(100000, 100000, 100000)  -- Strong force to keep the player in air
+        bodyVelocity.Velocity = Vector3.new(0, 50, 0)  -- Upwards velocity
+        bodyVelocity.Parent = humanoidRootPart
+        
+        -- Keep the player flying for 2 seconds
         local flightStartTime = tick()
-        local flightDuration = 2
-        while tick() - flightStartTime < flightDuration do
-            humanoidRootPart.CFrame = CFrame.new(originalPosition:Lerp(targetPosition, (tick() - flightStartTime) / flightDuration))
+        while tick() - flightStartTime < 2 do
             task.wait(0.03)
         end
-
-        -- Stop the flight and let the player fall back down
-        humanoidRootPart.CFrame = CFrame.new(targetPosition)
-        humanoid:ChangeState(Enum.HumanoidStateType.Physics)
-        humanoid.PlatformStand = true
         
-        -- Let the player fall back to the ground
+        -- Remove BodyVelocity and let the player fall
+        bodyVelocity:Destroy()
+        
+        -- Let the player fall back to the ground naturally
         task.wait(2) -- Fall duration
-        humanoid.PlatformStand = false
         humanoid:ChangeState(Enum.HumanoidStateType.Physics)
-        
+
         -- Stop the animation
         task.wait(5)
         animTracks.gojoUlt:Stop()
