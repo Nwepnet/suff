@@ -241,6 +241,12 @@ local function playAnimationSequence(player)
             EN = "I'll Just have to kill you both."
         })
         
+        -- Stop the boost immediately after wideStrike stops
+        animTracks.wideStrike.Stopped:Connect(function()
+            isBoostActive = false
+            ApplyBoost(Players.LocalPlayer.Character, 0)  -- Stop the boost
+        end)
+        
         task.wait(3)
         animTracks.wideStrike:Stop()
         
@@ -255,23 +261,16 @@ local function playAnimationSequence(player)
     end)
 end
 
--- Event handler for animation played
-local function onAnimationPlayed(animationTrack)
-    -- Check if the animation matches Lapse Blue
-    if animationTrack.Animation.AnimationId == cursedStrikesANIM.AnimationId then
-        -- Trigger the boost when skill is used
-        startMove1()
-        playAnimationSequence(Players.LocalPlayer)
+-- Event handler for when an animation is played
+local function onAnimationPlayed(animTrack)
+    if animTrack == animTracks.wideStrike then
+        -- Stop boost immediately when wideStrike stops
+        animTrack.Stopped:Connect(function()
+            isBoostActive = false
+            ApplyBoost(Players.LocalPlayer.Character, 0)  -- Stop the boost immediately
+        end)
     end
 end
-
--- Connect to local player's character
-local player = Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local humanoid = character:WaitForChild("Humanoid")
-
--- Connect animation played event
-humanoid.AnimationPlayed:Connect(onAnimationPlayed)
 -- SKILL 2 --
 
 local Players = game:GetService("Players")
