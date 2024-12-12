@@ -1,7 +1,7 @@
 -- Configuration for chat messages and boosts
 local CONFIG = {
     EnableChatMessages = true,  -- Set to false to disable chat messages
-    FrontDashBoostSpeed = 190,  -- Configurable front dash boost speed
+    FrontDashBoostSpeed = 250,  -- Configurable front dash boost speed
     SideDashBoostSpeed = 550,    -- Configurable side dash boost speed
     BoostDuration = 0.4,        -- Duration of boost
     Language = "EN"             -- Languages: JP (Japanese), EN (English)
@@ -77,6 +77,20 @@ local function ApplyBoost(character, boostSpeed)
                 isCurrentlyBoosting = false
                 boostConnection:Disconnect()
                 humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+            end
+        end)
+        
+        -- Repeat the boost while the animation plays
+        local repeatBoostConnection
+        repeatBoostConnection = game:GetService("RunService").Heartbeat:Connect(function()
+            if not isCurrentlyBoosting then
+                repeatBoostConnection:Disconnect()
+                return
+            end
+            
+            local elapsed = tick() - startTime
+            if elapsed > CONFIG.BoostDuration then
+                startTime = tick()  -- Reset the boost timer
             end
         end)
     end
