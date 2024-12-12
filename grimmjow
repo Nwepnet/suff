@@ -28,7 +28,7 @@ skillThreeTip.Text = ""
 skillFour.Text = "Evasive"
 ultTitle.Text = "PANTERA!"
 
--- SKILL 1 --
+-- SKILL 1
 
 -- Function to add dash
 local function EasingFunction(t, style, direction)
@@ -77,20 +77,6 @@ local function ApplyBoost(character, boostSpeed)
                 isCurrentlyBoosting = false
                 boostConnection:Disconnect()
                 humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
-            end
-        end)
-        
-        -- Repeat the boost while the animation plays
-        local repeatBoostConnection
-        repeatBoostConnection = game:GetService("RunService").Heartbeat:Connect(function()
-            if not isCurrentlyBoosting then
-                repeatBoostConnection:Disconnect()
-                return
-            end
-            
-            local elapsed = tick() - startTime
-            if elapsed > CONFIG.BoostDuration then
-                startTime = tick()  -- Reset the boost timer
             end
         end)
     end
@@ -241,14 +227,12 @@ local function playAnimationSequence(player)
             EN = "I'll Just have to kill you both."
         })
         
-        -- Stop the boost immediately after wideStrike stops
-        animTracks.wideStrike.Stopped:Connect(function()
-            isBoostActive = false
-            ApplyBoost(Players.LocalPlayer.Character, 0)  -- Stop the boost
-        end)
-        
         task.wait(3)
         animTracks.wideStrike:Stop()
+        
+        -- Immediately stop the boost when wideStrike stops
+        isBoostActive = false
+        ApplyBoost(player.Character, 0)  -- Stop boost
         
         -- Reset flag after sequence
         task.wait(PLAY_DURATION)
@@ -261,16 +245,23 @@ local function playAnimationSequence(player)
     end)
 end
 
--- Event handler for when an animation is played
-local function onAnimationPlayed(animTrack)
-    if animTrack == animTracks.wideStrike then
-        -- Stop boost immediately when wideStrike stops
-        animTrack.Stopped:Connect(function()
-            isBoostActive = false
-            ApplyBoost(Players.LocalPlayer.Character, 0)  -- Stop the boost immediately
-        end)
+-- Event handler for animation played
+local function onAnimationPlayed(animationTrack)
+    -- Check if the animation matches Lapse Blue
+    if animationTrack.Animation.AnimationId == cursedStrikesANIM.AnimationId then
+        -- Trigger the boost when skill is used
+        startMove1()
+        playAnimationSequence(Players.LocalPlayer)
     end
 end
+
+-- Connect to local player's animation
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+
+-- Connect animation played event
+humanoid.AnimationPlayed:Connect(onAnimationPlayed)
 -- SKILL 2 --
 
 local Players = game:GetService("Players")
