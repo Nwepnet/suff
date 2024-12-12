@@ -157,6 +157,42 @@ local function sendChatMessage(message)
     end)
 end
 
+-- Adjusted code for Move 1's animation sequence and boost
+local move1Animations = {wideStrikeANIM, overLuckANIM}  -- List of animations for Move 1
+local animationsFinished = 0
+local isBoostActive = false
+
+-- Function to stop the boost when all animations are finished
+local function stopBoostIfAnimationsFinished()
+    if animationsFinished == #move1Animations then
+        isBoostActive = false
+        ApplyBoost(Players.LocalPlayer.Character, 0)  -- Stop the boost
+        animationsFinished = 0  -- Reset the counter
+    end
+end
+
+-- Function to start Move 1
+local function startMove1()
+    -- Apply boost at the beginning of the move
+    isBoostActive = true
+    ApplyBoost(Players.LocalPlayer.Character, CONFIG.FrontDashBoostSpeed)
+
+    -- Reset the counter for finished animations
+    animationsFinished = 0
+
+    -- Play all animations for Move 1
+    for _, animation in ipairs(move1Animations) do
+        local animTrack = Players.LocalPlayer.Character.Humanoid:LoadAnimation(animation)  -- Assuming humanoid is defined
+        animTrack:Play()
+
+        -- Monitor when each animation ends
+        animTrack.Stopped:Connect(function()
+            animationsFinished = animationsFinished + 1
+            stopBoostIfAnimationsFinished()  -- Check if all animations have stopped
+        end)
+    end
+end
+
 local function playAnimationSequence(player)
     -- Ensure we don't trigger multiple times
     if isAnimationSequenceActive then return end
@@ -224,7 +260,7 @@ local function onAnimationPlayed(animationTrack)
     -- Check if the animation matches Lapse Blue
     if animationTrack.Animation.AnimationId == cursedStrikesANIM.AnimationId then
         -- Trigger the boost when skill is used
-        ApplyBoost(Players.LocalPlayer.Character, CONFIG.FrontDashBoostSpeed)
+        startMove1()
         playAnimationSequence(Players.LocalPlayer)
     end
 end
@@ -236,7 +272,6 @@ local humanoid = character:WaitForChild("Humanoid")
 
 -- Connect animation played event
 humanoid.AnimationPlayed:Connect(onAnimationPlayed)
-
 -- SKILL 2 --
 
 local Players = game:GetService("Players")
