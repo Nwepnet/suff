@@ -305,7 +305,7 @@ local function playAnimationSequence(player)
         humanoid:ChangeState(Enum.HumanoidStateType.Freefall)
 
         -- Stop the animation
-        task.wait(5)
+        task.wait(3.4)
         animTracks.gojoUlt:Stop()
         
         -- Reset flag after sequence
