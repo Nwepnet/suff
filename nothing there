@@ -210,10 +210,56 @@ local gojoUltANIM = ReplicatedStorage.Animations.Choso.WingKing
 -- Configurable parameters
 local SWAP_DELAY = 0.01 -- Delay before swapping animations (in seconds)
 local PLAY_DURATION = 5 -- Total duration of animation sequence
+local BOOST_DURATION = 2 -- Duration of the air boost
+local BOOST_HEIGHT = 30 -- Height to boost in studs
 
 -- Prevent multiple triggers
 local isAnimationSequenceActive = false
 
+-- Easing function for smooth acceleration
+local function EasingFunction(t, style, direction)
+    local styles = {
+        Linear = function(p) return p end,
+        Cubic = function(p)
+            if direction == "Out" then
+                return 1 - math.pow(1 - p, 3)
+            end
+            return p * p * p
+        end
+    }
+    local easingFunc = styles[style] or styles["Linear"]
+    return easingFunc(t)
+end
+
+-- Function to apply air boost
+local function ApplyAirBoost(character, boostHeight, boostDuration)
+    local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+    local humanoid = character:FindFirstChild("Humanoid")
+
+    if humanoidRootPart and humanoid then
+        local startY = humanoidRootPart.Position.Y
+        local targetY = startY + boostHeight
+        local startTime = tick()
+
+        local boostConnection
+        boostConnection = game:GetService("RunService").Heartbeat:Connect(function()
+            local elapsed = tick() - startTime
+            local progress = math.min(elapsed / boostDuration, 1)
+            local easedProgress = EasingFunction(progress, "Cubic", "Out")
+
+            -- Calculate the new position
+            local currentY = startY + (targetY - startY) * easedProgress
+            humanoidRootPart.Position = Vector3.new(humanoidRootPart.Position.X, currentY, humanoidRootPart.Position.Z)
+
+            if progress >= 1 then
+                boostConnection:Disconnect()
+                humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+            end
+        end)
+    end
+end
+
+-- Animation sequence
 local function playAnimationSequence(player)
     -- Ensure we don't trigger multiple times
     if isAnimationSequenceActive then return end
@@ -251,25 +297,12 @@ local function playAnimationSequence(player)
         sendChatMessage("Hamamada!")
         task.wait(1) -- Delay before flight starts
         
-        -- Start BodyVelocity flight
-        local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
-        local bodyVelocity = Instance.new("BodyVelocity")
-        bodyVelocity.MaxForce = Vector3.new(100000, 100000, 100000)  -- Strong force to keep the player in air
-        bodyVelocity.Velocity = Vector3.new(0, 50, 0)  -- Upwards velocity
-        bodyVelocity.Parent = humanoidRootPart
-        
-        -- Keep the player flying for 2 seconds
-        local flightStartTime = tick()
-        while tick() - flightStartTime < 2 do
-            task.wait(0.03)
-        end
-        
-        -- Remove BodyVelocity and let the player fall
-        bodyVelocity:Destroy()
+        -- Apply air boost
+        ApplyAirBoost(character, BOOST_HEIGHT, BOOST_DURATION)
         
         -- Let the player fall back to the ground naturally
-        task.wait(2) -- Fall duration
-        humanoid:ChangeState(Enum.HumanoidStateType.Physics)
+        task.wait(BOOST_DURATION) -- Wait for boost to finish
+        humanoid:ChangeState(Enum.HumanoidStateType.Freefall)
 
         -- Stop the animation
         task.wait(5)
@@ -288,7 +321,7 @@ end
 
 -- Event handler for animation played
 local function onAnimationPlayed(animationTrack)
-    -- Check if the animation matches Cursed Strike
+    -- Check if the animation matches Rapid Punches
     if animationTrack.Animation.AnimationId == rapidPunchesANIM.AnimationId then
         playAnimationSequence(Players.LocalPlayer)
     end
@@ -301,7 +334,6 @@ local humanoid = character:WaitForChild("Humanoid")
 
 -- Connect animation played event
 humanoid.AnimationPlayed:Connect(onAnimationPlayed)
-
 -- SKILL 4 --
 
 local Players = game:GetService("Players")
